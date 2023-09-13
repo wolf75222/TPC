@@ -11,6 +11,36 @@ Ce script Bash permet de compiler, exécuter, et gérer des programmes C en simp
 - GCC (GNU Compiler Collection)
 - zip (pour l'archivage)
 
+## Arborescence des TP
+
+Afin d'assurer une organisation correcte des travaux pratiques (TP), il est essentiel de suivre l'arborescence suivante :
+
+```
+.
+├── TP1                          # Dossier pour le TP numéro 1
+│   ├── Exo1                     # Dossier pour le premier exercice du TP1
+│   │   ├── Exo1_Q1.c            # Fichier C pour la première question de l'exercice 1
+│   │   ├── Exo1_Q2.c            # Fichier C pour la deuxième question de l'exercice 1
+│   │   └── ...
+│   ├── Exo2
+│   │   ├── Exo2_Q1.c
+│   │   └── ...
+│   └── ...
+├── TP2
+│   ├── Exo1
+│   │   ├── Exo1_Q1.c
+│   │   └── ...
+│   └── ...
+└── ...
+```
+
+- **TPX** : Dossier principal pour chaque TP où `X` est le numéro du TP.
+- **ExoY** : Sous-dossier pour chaque exercice du TP où `Y` est le numéro de l'exercice.
+- **ExoY_QZ.c** : Fichier C pour chaque question de l'exercice où `Z` est le numéro de la question.
+
+Veuillez suivre cette structure pour chaque nouveau TP afin de garantir une cohérence et une lisibilité optimale de vos travaux.
+
+
 ## Fonctionnalités
 
 - Compile un programme C en fonction des numéros de TP, d'exercice, et de question
