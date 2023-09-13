@@ -2,6 +2,8 @@
 
 Ce script Bash permet de compiler, exécuter, et gérer des programmes C en simplifiant les opérations de développement typiques. Il prend en charge diverses options pour offrir une flexibilité maximale.
 
+![alt text](https://github.com/wolf75222/TPC/assets/demo.png)
+
 ## Prérequis
 
 - Bash 4.0 ou supérieur
