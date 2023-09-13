@@ -124,7 +124,7 @@ BASE_DIR=/chemin/vers/vos/fichiers
 LOG_DIR=/chemin/vers/vos/logs
 # Type OS : UNIX, WIN
 OS=UNIX
-
+```
 
 ## 1. Rendre le script exécutable :
 
