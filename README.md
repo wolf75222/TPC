@@ -212,6 +212,58 @@ source ~/.zshrc
 
 Maintenant, vous devriez pouvoir exécuter votre script comme une commande en utilisant son nom (ou l'alias que vous avez défini) de n'importe où dans votre terminal.
 
+## Configuration pour Windows Terminal
+
+### 1. **PowerShell (`profile.ps1`)**
+
+1. Ouvrez **PowerShell** en tant qu'administrateur.
+   
+2. Vérifiez l'emplacement de votre fichier `profile.ps1` avec la commande :
+   ```powershell
+   $PROFILE
+   ```
+
+3. Si le fichier n'existe pas, créez-le :
+   ```powershell
+   New-Item -Type File -Path $PROFILE -Force
+   ```
+
+4. Ouvrez ce fichier avec un éditeur (par exemple `notepad`) :
+   ```powershell
+   notepad $PROFILE
+   ```
+
+5. Ajoutez les lignes suivantes :
+   ```powershell
+   $env:PATH = "$env:PATH;C:\chemin\vers\votre\repertoire"
+   Set-Alias -Name tpc -Value "C:\chemin\vers\votre\cc.sh"
+   ```
+
+6. Sauvegardez et fermez le fichier.
+
+7. Pour que les modifications prennent effet, fermez et rouvrez **PowerShell**.
+
+### 2. **Variables d'environnement globales (Propriétés système)**
+
+1. Cliquez droit sur le bouton "Démarrer" ou appuyez sur la touche **Windows + X**, puis choisissez "Système".
+
+2. Sélectionnez "Paramètres système avancés" sur le côté gauche.
+
+3. Cliquez sur "Variables d'environnement" en bas à droite.
+
+4. Sous "Variables utilisateur", recherchez la variable `Path` et cliquez sur "Modifier". 
+
+5. Ajoutez `C:\chemin\vers\votre\repertoire` à la fin de la liste des valeurs. Assurez-vous qu'il y a un point-virgule (`;`) séparant chaque entrée.
+
+6. Cliquez sur "OK" pour fermer chaque fenêtre.
+
+```
+**Note**: L'ajout d'alias est plus simple via la première méthode (`profile.ps1` avec PowerShell).
+```
+
+Maintenant, vous devriez pouvoir exécuter votre script comme une commande en utilisant son nom (ou l'alias que vous avez défini) de n'importe où dans votre terminal.
+
+
 ## Licence
 
 Ce script est distribué sous la licence MIT. Vous êtes libre de l'utiliser, de le modifier et de le redistribuer.
