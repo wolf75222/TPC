@@ -113,6 +113,19 @@ Options disponibles:
 - Assurez-vous que les répertoires spécifiés dans `BASE_DIR` et `LOG_DIR` existent et sont accessibles.
 - La commande `open` est spécifique aux systèmes qui la supportent, comme macOS.
 
+## Configuration
+
+Avant de démarrer, veuillez configurer les variables d'environnement nécessaires. Créez un fichier `.env` à la racine du projet et spécifiez les valeurs suivantes :
+
+```env
+# Chemin vers le dossier contenant les fichiers C
+BASE_DIR=/chemin/vers/vos/fichiers
+# Chemin vers les Logs
+LOG_DIR=/chemin/vers/vos/logs
+# Type OS : UNIX, WIN
+OS=UNIX
+
+
 ## 1. Rendre le script exécutable :
 
 Si ce n'est pas déjà fait, rendez le script exécutable en utilisant `chmod`:

@@ -1,8 +1,22 @@
 #!/bin/bash
 
-# Chemin vers le dossier contenant les fichiers C
-BASE_DIR="/Users/romaindespoulain/Documents/L2/Semestre_3/INFO301_C/TP/TP_INFO0301"
-LOG_DIR="/Users/romaindespoulain/Documents"
+
+# Chemin absolu vers le script courant
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+
+# Charger les variables d'environnement depuis .env situé à la racine
+if [ -f "$SCRIPT_DIR/../.env" ]; then
+    while read -r line; do
+        # Ignorer les commentaires
+        [[ $line =~ ^#.*$ ]] && continue
+        # Exporter la variable s'il y a quelque chose à exporter
+        [ -n "$line" ] && export "$line"
+    done < "$SCRIPT_DIR/../.env"
+else
+    echo ".env n'existe pas"
+    [ $LOGGING -eq 1 ] && log_message "Le fichier .env n'existe pas"
+    exit 1
+fi
 
 # Vérification de l'existence du dossier
 if [ ! -d $BASE_DIR ]; then
@@ -11,7 +25,19 @@ if [ ! -d $BASE_DIR ]; then
     exit 1
 fi
 
+# Vérification de l'existence du dossier 
+if [ ! -d $LOG_DIR ]; then
+    echo "Le fichier $LOG_DIR n'existe pas"
+    [ $LOGGING -eq 1 ] && log_message "Le fichier $LOG_DIR n'existe pas"
+    exit 1
+fi
     
+# Vérification de l'existence de la variable d'environnement, spécifiant l'os (UNIX ou WIN)
+if [ ! -d $OS ]; then
+    echo "la variable d'environnement, spécifiant l'os (UNIX ou WIN) n'existe pas ou n'est pas valide"
+    [ $LOGGING -eq 1 ] && log_message "la variable d'environnement, spécifiant l'os (UNIX ou WIN) n'existe pas ou n'est pas valide"
+    exit 1
+fi
 
 # Variables pour les options
 REMOVE_COMPILED=0
@@ -28,10 +54,14 @@ OPTIMIZE=0
 ARCHIVE=0
 
 
-# Fonction de journalisation
+# Fonction de journalisation selon l'os
 log_message() {
     local message=$1
-    local log_file="${LOG_DIR}/compilation.txt"
+    if [ WIN -e $OS ]; then
+        local log_file="${LOG_DIR}\compilation.txt"
+    else
+        local log_file="${LOG_DIR}/compilation.txt"
+    fi
     echo "$(date): $message" >> $log_file
 }
 
@@ -177,9 +207,14 @@ num_tp=$1
 num_exo=$2
 num_question=$3
 
-# Chemin du fichier
-file_path="${BASE_DIR}/TP${num_tp}/Exo${num_exo}/Exo${num_exo}_Q${num_question}.c"
-output_name="${BASE_DIR}/TP${num_tp}/Exo${num_exo}/Exo${num_exo}_Q${num_question}"
+# Chemin du fichier selon l'os
+if [ WIN -e $OS ]; then
+    file_path="${BASE_DIR}\TP${num_tp}\Exo${num_exo}\Exo${num_exo}_Q${num_question}.c"
+output_name="${BASE_DIR}\TP${num_tp}\Exo${num_exo}\Exo${num_exo}_Q${num_question}"
+else 
+    file_path="${BASE_DIR}/TP${num_tp}/Exo${num_exo}/Exo${num_exo}_Q${num_question}.c"
+    output_name="${BASE_DIR}/TP${num_tp}/Exo${num_exo}/Exo${num_exo}_Q${num_question}"
+fi
 
 # Vérification de l'existence du fichier
 if [ ! -f $file_path ]; then
