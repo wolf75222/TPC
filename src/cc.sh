@@ -25,6 +25,7 @@ if [ ! -d $BASE_DIR ]; then
     exit 1
 fi
 
+
 # Vérification de l'existence du dossier 
 if [ ! -d $LOG_DIR ]; then
     echo "Le fichier $LOG_DIR n'existe pas"
@@ -33,7 +34,7 @@ if [ ! -d $LOG_DIR ]; then
 fi
     
 # Vérification de l'existence de la variable d'environnement, spécifiant l'os (UNIX ou WIN)
-if [ ! -d $OS ]; then
+if [ ! -n $OS ]; then
     echo "la variable d'environnement, spécifiant l'os (UNIX ou WIN) n'existe pas ou n'est pas valide"
     [ $LOGGING -eq 1 ] && log_message "la variable d'environnement, spécifiant l'os (UNIX ou WIN) n'existe pas ou n'est pas valide"
     exit 1
@@ -208,7 +209,7 @@ num_exo=$2
 num_question=$3
 
 # Chemin du fichier selon l'os
-if [ WIN -e $OS ]; then
+if [ WIN = $OS ]; then
     file_path="${BASE_DIR}\TP${num_tp}\Exo${num_exo}\Exo${num_exo}_Q${num_question}.c"
 output_name="${BASE_DIR}\TP${num_tp}\Exo${num_exo}\Exo${num_exo}_Q${num_question}"
 else 
