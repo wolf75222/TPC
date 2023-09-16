@@ -10,6 +10,10 @@ Ce script Bash permet de compiler, exécuter, et gérer des programmes C en simp
 - Bash 4.0 ou supérieur
 - GCC (GNU Compiler Collection)
 - zip (pour l'archivage)
+- tar (pour l'archivage)
+- PowerShell (pour Windows)
+- gedit (pour l'ouverture de fichiers)
+- nano (pour l'ouverture de fichiers)
 
 ## Arborescence des TP
 
@@ -43,75 +47,92 @@ Veuillez suivre cette structure pour chaque nouveau TP afin de garantir une coh�
 
 ## Fonctionnalités
 
-- Compile un programme C en fonction des numéros de TP, d'exercice, et de question
-- Exécute le programme compilé
-- Supprime le fichier compilé après exécution
-- Ouvre le fichier compilé (sur les systèmes qui supportent la commande `open`)
-- Logging des actions dans un fichier
-- Vérification de la syntaxe
-- Mode debug pour la compilation
-- Mode silencieux
-- Exécution sans compilation (utilise l'exécutable existant)
-- Liste tous les fichiers C dans le répertoire de base
-- Nettoie les fichiers objets et temporaires
-- Optimise la compilation avec `gcc -O2`
-- Archive le TP en fichier zip
+- **Configuration des variables d'environnement** : `tpc -c`
+  
+- **Compilation et exécution** : Compile et exécute le fichier C spécifié.
+  
+- **Suppression du fichier compilé** : `tpc -r`
+  
+- **Ouverture du fichier** : Ouvre le fichier spécifié avec `gedit` : `tpc -o`
+  
+- **Affichage de l'aide** : Montre une liste des options disponibles et comment les utiliser : `tpc -h`
+  
+- **Activation de la journalisation** : Journalise toutes les actions effectuées : `tpc -l`
+  
+- **Vérification de la syntaxe** : Vérifie la syntaxe du fichier C spécifié : `tpc -v`
+  
+- **Mode Debug** : Compile le fichier en mode debug : `tpc -d`
+  
+- **Mode silencieux** : Exécute le script en mode silencieux : `tpc -s`
+  
+- **Exécution sans compilation** : Si un fichier déjà compilé existe, l'exécute directement : `tpc -x`
+  
+- **Liste des fichiers C** : Montre une liste de tous les fichiers C dans le répertoire de base : `tpc -L`
+  
+- **Suppression des fichiers temporaires** : Supprime les fichiers objets et temporaires du TP spécifié : `tpc -n`
+  
+- **Optimisation** : Active l'optimisation de la compilation : `tpc -O`
+  
+- **Archivage** : Archive le TP spécifié : `tpc -a`
+  
+- **Extraction d'archive dans le dossier courant** : `tpc -e`
+  
+- **Création de la structure de TP** : Crée la structure du TP avec des fichiers C dans le dossier spécifié : `tpc -f`
+  
+- **Ajout d'un modèle de fichier** : Ajoute un modèle à un fichier C existant ou crée un fichier C avec un modèle : `tpc -t`
 
-## Utilisation
+## Exemples d'utilisation
 
-Syntaxe de base:
+1. **Compiler et exécuter un fichier spécifique** :
+    ```bash
+    tpc 1 1 1   # Compile et exécute Exo1_Q1.c du TP1
+    tpc first.c # Compile et exécute first.c
+    ```
 
-```bash
-./cc.sh <num_tp> <num_exo> <num_question> [options]
-```
+2. **Archivage** :
+    ```bash
+    tpc -a 1 zip               # Archive le TP1 au format zip
+    tpc -a /path/to/dir tar.gz # Archive le dossier spécifié au format tar.gz
+    ```
 
-Options disponibles:
+3. **Ouvrir un fichier avec `gedit`** :
+    ```bash
+    tpc -o 1 2 1  # Ouvre Exo2_Q1.c du TP1 avec gedit
+    ```
 
-```
-  -c  Supprime le fichier compilé
-  -o  Ouvre le fichier compilé
-  -h  Affiche l'aide
-  -l  Active le logging
-  -v  Vérifie la syntaxe du fichier C
-  -d  Active le mode debug
-  -s  Mode silencieux
-  -x  Exécute sans compilation
-  -L  Liste tous les fichiers .c
-  -n  Nettoie les fichiers objets ou temporaires
-  -O  Optimise la compilation (gcc -O2)
-  -a  Archive le TP
-```
+4. **Exécution sans compilation** :
+    ```bash
+    tpc -x 1 2 1  # Exécute le fichier compilé Exo2_Q1.c du TP1
+    ```
 
-## Exemples
+5. **Afficher la liste des fichiers C** :
+    ```bash
+    tpc -L  # Affiche la liste des fichiers .c dans le répertoire de base
+    ```
 
-- Pour compiler et exécuter le TP 1, Exercice 2, Question 3 :
+6. **Supprimer les fichiers temporaires** :
+    ```bash
+    tpc -n 1  # Supprime les fichiers objets/temporaires du TP1
+    ```
 
-```bash
-./cc.sh 1 2 3
-```
+7. **Créer la structure de TP** :
+    ```bash
+    tpc -f /path/to/dir  # Crée la structure de TP dans le dossier spécifié
+    ```
 
-- Pour vérifier la syntaxe sans compilation :
+8. **Ajouter un modèle à un fichier C** :
+    ```bash
+    tpc -t /path/to/file  # Ajoute un modèle de fichier
+    ```
 
-```bash
-./cc.sh 1 2 3 -v
-```
+Et bien plus encore...
 
-- Pour activer le logging :
-
-```bash
-./cc.sh 1 2 3 -l
-```
-
-- Pour archiver le TP 1 :
-
-```bash
-./cc.sh -a 1
-```
 
 ## Notes
 
 - Assurez-vous que les répertoires spécifiés dans `BASE_DIR` et `LOG_DIR` existent et sont accessibles.
-- La commande `open` est spécifique aux systèmes qui la supportent, comme macOS.
+- Le script ne fonctionne que pour les fichiers C (`.c`).
+- Le script ne fonctionne que pour les systèmes UNIX (Linux, macOS, etc.) et Windows (via PowerShell).
 
 ## Configuration
 
@@ -126,25 +147,33 @@ LOG_DIR=/chemin/vers/vos/logs
 OS=UNIX
 ```
 
-## 1. Rendre le script exécutable :
+### 1. Rendre le script exécutable :
 
-Si ce n'est pas déjà fait, rendez le script exécutable en utilisant `chmod`:
+Pour rendre le script exécutable :
 
 ```bash
-chmod +x /chemin/vers/votre/cc.sh
+chmod +x /chemin/vers/votre/script
 ```
 
-Remplacez `/chemin/vers/votre/` par le chemin réel vers votre script.
+### 2. Configuration automatique:
 
-## 2. Ajouter le script à votre `PATH`
+Après avoir cloné le dépôt:
 
-Vous avez deux choix ici:
+1. Naviguez vers le dossier du dépôt:
+```bash
+cd nom_du_dossier
+```
 
-### a. Ajouter tout le répertoire au `PATH` :
+2. Exécutez le script de configuration:
+```bash
+./setup_tpc.sh
+```
 
-Si vous avez plusieurs scripts dans le même répertoire et que vous voulez tous les rendre accessibles, ajoutez le répertoire à votre `PATH`.
+### 3. Configuration manuelle:
 
-#### Pour Bash:
+#### a. Ajouter le script à votre `PATH`:
+
+##### Pour Bash:
 
 Ouvrez votre fichier `~/.bashrc`:
 
@@ -152,13 +181,13 @@ Ouvrez votre fichier `~/.bashrc`:
 nano ~/.bashrc
 ```
 
-Ajoutez cette ligne à la fin :
+Ajoutez cette ligne à la fin:
 
 ```bash
 export PATH="$PATH:/chemin/vers/votre/répertoire"
 ```
 
-#### Pour Zsh:
+##### Pour Zsh:
 
 Ouvrez votre fichier `~/.zshrc`:
 
@@ -166,17 +195,15 @@ Ouvrez votre fichier `~/.zshrc`:
 nano ~/.zshrc
 ```
 
-Ajoutez cette ligne à la fin :
+Ajoutez cette ligne à la fin:
 
 ```bash
 export PATH="$PATH:/chemin/vers/votre/répertoire"
 ```
 
-### b. Créer un alias pour le script:
+#### b. Créer un alias pour le script:
 
-Si vous ne voulez pas ajouter tout le répertoire à votre `PATH`, vous pouvez simplement créer un alias pour le script.
-
-#### Pour Bash:
+##### Pour Bash:
 
 Dans `~/.bashrc`:
 
@@ -184,9 +211,7 @@ Dans `~/.bashrc`:
 alias tpc="/chemin/vers/votre/cc.sh"
 ```
 
-Remplacez `nomcommande` par le nom que vous voulez utiliser pour votre commande.
-
-#### Pour Zsh:
+##### Pour Zsh:
 
 Dans `~/.zshrc`:
 
@@ -194,9 +219,7 @@ Dans `~/.zshrc`:
 alias tpc="/chemin/vers/votre/cc.sh"
 ```
 
-## 3. Recharger le fichier de configuration
-
-Après avoir ajouté le répertoire à votre `PATH` ou créé un alias pour votre script, rechargez le fichier de configuration pour que les changements prennent effet.
+### 4. Recharger le fichier de configuration:
 
 #### Pour Bash:
 
@@ -209,9 +232,6 @@ source ~/.bashrc
 ```bash
 source ~/.zshrc
 ```
-
-Maintenant, vous devriez pouvoir exécuter votre script comme une commande en utilisant son nom (ou l'alias que vous avez défini) de n'importe où dans votre terminal.
-
 ## Configuration pour Windows Terminal
 
 ### 1. **PowerShell (`profile.ps1`)**
@@ -257,9 +277,9 @@ Maintenant, vous devriez pouvoir exécuter votre script comme une commande en ut
 
 6. Cliquez sur "OK" pour fermer chaque fenêtre.
 
-```
+
 **Note**: L'ajout d'alias est plus simple via la première méthode (`profile.ps1` avec PowerShell).
-```
+
 
 Maintenant, vous devriez pouvoir exécuter votre script comme une commande en utilisant son nom (ou l'alias que vous avez défini) de n'importe où dans votre terminal.
 
