@@ -152,7 +152,7 @@ OS=UNIX
 Pour rendre le script exécutable :
 
 ```bash
-chmod +x /chemin/vers/votre/script
+chmod +x setup.sh
 ```
 
 ### 2. Configuration automatique:
@@ -161,12 +161,12 @@ Après avoir cloné le dépôt:
 
 1. Naviguez vers le dossier du dépôt:
 ```bash
-cd nom_du_dossier
+cd TPC
 ```
 
 2. Exécutez le script de configuration:
 ```bash
-./setup_tpc.sh
+./setup.sh
 ```
 
 ### 3. Configuration manuelle:
@@ -208,7 +208,7 @@ export PATH="$PATH:/chemin/vers/votre/répertoire"
 Dans `~/.bashrc`:
 
 ```bash
-alias tpc="/chemin/vers/votre/cc.sh"
+alias tpc="/chemin/vers/votre/tpc.sh"
 ```
 
 ##### Pour Zsh:
@@ -216,7 +216,7 @@ alias tpc="/chemin/vers/votre/cc.sh"
 Dans `~/.zshrc`:
 
 ```bash
-alias tpc="/chemin/vers/votre/cc.sh"
+alias tpc="/chemin/vers/votre/tpc.sh"
 ```
 
 ### 4. Recharger le fichier de configuration:
