@@ -110,6 +110,7 @@ log_message() {
 
 
 # Variables pour les options
+READ_FILE=0
 REMOVE_COMPILED=0
 OPEN_COMPILED=0
 SHOW_HELP=0
@@ -126,6 +127,17 @@ EVERYWHERE=0
 STRUCTURE=0
 USE_TEMPLATE=0
 CONFIG_ENV=0
+
+##############################
+# Variable pour la template  #
+##############################
+
+tp_num=0
+line_index=0
+exo_content=()
+current_exo_num=0
+count=0
+TEMPLATE_FILE=""
 
 
 
@@ -162,6 +174,7 @@ show_help() {
     Options:
         -c : Configure les variables d'environnement
 
+        -p: créer la structure à partir d'un fichier pdf
         -r : Supprime le fichier compilé
         -o : Ouvre le fichier (gedit)
         -h : Affiche l'aide
@@ -422,6 +435,56 @@ create_tp_structure() {
     done
 }
 
+# create_tp_structure_pdf array
+create_tp_structure_pdf() {
+    # Récupérer le dossier de base passé en paramètre
+    local base_dir=$BASE_DIR
+     text="Le dossier de base est $base_dir"
+    output_message "$text" "blue"
+    log_message "$text"
+
+    # Demandez à l'utilisateur le numéro du TP
+ 
+   # Créez le dossier du TP
+    tp_dir="${base_dir}/TP${tp_num}"
+    if [[ -d $tp_dir ]]; then
+        output_message "Le dossier $tp_dir existe déja" "red"
+        exit 0
+    fi
+    mkdir -p $tp_dir
+    text="Le dossier $tp_dir a été créé"
+    output_message "$text" "blue"
+    log_message "$text"
+
+    # Demandez à l'utilisateur combien d'exercices sont dans ce TP
+     for (( exo_num=1; exo_num<=${#arr[*]}; exo_num++ )); do
+        exo_dir="${tp_dir}/Exo${exo_num}"
+        mkdir -p $exo_dir
+        text="Le dossier $exo_dir a été créé"
+        output_message "$text" "blue"
+        log_message "$text"
+
+        # Demandez à l'utilisateur combien de questions sont dans cet exercice
+        temp=$exo_num-1
+        for (( q_num=1; q_num<=arr[$temp]; q_num++ )); do
+            file_path="${exo_dir}/Exo${exo_num}_Q${q_num}.c"
+            
+            # Remplacez touch par add_template
+            add_template $file_path
+            
+            text="Le fichier ${file_path} a été créé avec le modèle"
+            output_message "$text" "blue"
+            log_message "$text"
+        done
+    done
+}
+
+
+# extract_pdf_file file.pdf
+# extract_pdf_file(){
+    
+# }
+
 
 # Fonction pour ajouter un modèle
 add_template() {
@@ -501,8 +564,12 @@ configure_env() {
 ##############################
 
 # Traitement des options
-while getopts "rohlvdnsxLOaeftc" opt; do
+while getopts "rohlvdnsxLOaeftcp" opt; do
     case $opt in
+
+        p)
+            READ_FILE=1
+            ;;
         r)
             REMOVE_COMPILED=1
             ;;
@@ -565,6 +632,30 @@ shift $((OPTIND-1))
 ##############################
 # Corps du script            #
 ##############################
+
+
+if [ $READ_FILE -eq 1 ]; then
+    check_args 1 "$@"
+    check_file $1
+    filecontent=$(pdftotext $1 -)
+    IFS=$'\n' read -d '' -ra lines <<< "$filecontent"
+    for line in "${lines[@]}"; do
+        if [[ $line_index -eq 1 ]]; then
+            tp_num=$(echo "$line" | tr -dc '0-9')
+        fi
+        if [[ "$line" == *Exercice* ]]; then
+            ((current_exo_num++))  
+            exo_content[$current_exo_num]=0
+        elif [[ "$line" == *"•"* ]]; then
+            ((exo_content[$current_exo_num]++))  
+        fi
+        ((line_index++))
+    done
+    create_tp_structure_pdf "${exo_content[@]}"
+    exit 0 
+fi
+
+
 
 
 # -h
@@ -821,6 +912,7 @@ fi
 if [ $REMOVE_COMPILED -eq 1 ]; then
     remove_compiled $output_name
 fi
+
 
 
 exit 0
