@@ -174,6 +174,7 @@ show_help() {
     Options:
         -c : Configure les variables d'environnement
 
+        -p: créer la structure à partir d'un fichier pdf
         -r : Supprime le fichier compilé
         -o : Ouvre le fichier (gedit)
         -h : Affiche l'aide
