@@ -124,6 +124,8 @@ EVERYWHERE=0
 STRUCTURE=0
 USE_TEMPLATE=0
 CONFIG_ENV=0
+VERIF_ALL=0
+READ_ALL=0
 
 ##############################
 # Variable pour la template  #
@@ -213,6 +215,8 @@ show_help() {
         -e : Archive le TP dans le dossier courant
         -f : Crée la structure du TP avec les fichiers .c
         -t : Ajoute un modèle de fichier .c ou Crée un fichier .c avec le modèle
+        -w : Compile et exécute tous les fichiers .c dans le dossier
+        -z : Supprime tous les fichiers compilés dans le dossier 
 
 
     Exemples:
@@ -582,13 +586,113 @@ configure_env() {
 
 }
 
+compile_all() {
+    local dir=$1
+    local files=$(find $dir -name "*.c")
+    local file_count=$(find $dir -name "*.c" | wc -l)
+    local compiled_count=0
+    local error_count=0
+    local warning_count=0
+    local error_files=()
+    local warning_files=()
+    local compiled_files=()
+    local GCC_OPTS="-Wall -Wextra -Wconversion"
+    [ $DEBUG_MODE -eq 1 ] && GCC_OPTS+=" -g"
+    [ $OPTIMIZE -eq 1 ] && GCC_OPTS+=" -O2"
+
+    if [ -n "$files" ]; then
+        for file in $files; do
+            output_name="${file%.*}"
+            gcc $GCC_OPTS $file -o $output_name 2> /tmp/tpc_error.txt
+            if [ $? -ne 0 ]; then
+                error_files+=("$file")
+                ((error_count++))
+            else
+                compiled_files+=("$file")
+                ((compiled_count++))
+            fi
+            if [ -s /tmp/tpc_error.txt ]; then
+                warning_files+=("$file")
+                ((warning_count++))
+            fi
+        done
+        if [ $error_count -ne 0 ]; then
+            text="Erreur lors de la compilation de $error_count fichier(s)"
+            output_message "$text" "red"
+            log_message "$text"
+            for file in "${error_files[@]}"; do
+                text="Erreur lors de la compilation de $file"
+                output_message "$text" "red"
+                log_message "$text"
+            done
+            exit 2
+        elif [ $warning_count -ne 0 ]; then
+            text="Attention, $warning_count fichier(s) contient des warnings"
+            output_message "$text" "red"
+            log_message "$text"
+            for file in "${warning_files[@]}"; do
+                text="Attention, $file contient des warnings"
+                output_message "$text" "red"
+                log_message "$text"
+            done
+        else
+            text="Tous les fichiers ont été compilés avec succès"
+            output_message "$text" "green"
+            log_message "$text"
+        fi
+        if [ $EXEC_ONLY -eq 0 ]; then
+            for file in "${compiled_files[@]}"; do
+                output_name="${file%.*}"
+                chmod +x "$output_name"
+                if [[ "$output_name" == */* ]]; then
+                    $output_name
+                else
+                    ./$output_name
+                fi
+                if [ $? -ne 0 ]; then
+                    text="Erreur lors de l'exécution de $file"
+                    output_message "$text" "red"
+                    log_message "$text"
+                    exit 3
+                fi
+            done
+            text="Tous les fichiers ont été exécutés avec succès"
+            output_message "$text" "green"
+            log_message "$text"
+        fi
+    else
+        text="Aucun fichier trouvé"
+        output_message "$text" "blue"
+        log_message "$text"
+    fi
+}
+
+# Fonction de suppression de tous les fichiers .out .exe .err (et du meme nom que les fichiers .c sans l'exetension) : Fonction(dir) -> Affichage
+remove_compiled_all() {
+    local dir=$1
+    local files=$(find $dir -name "*.o" -o -name "*.out" -o -name "*.exe" -o -name "*.err" -o  -name "*.c" | sed 's/\.c//g')
+    if [ -n "$files" ]; then
+        rm $files
+        text="Les fichiers supprimés sont : $files"
+        output_message "$text" "blue"
+        log_message "$text"
+    else
+        text="Aucun fichier trouvé"
+        output_message "$text" "blue"
+        log_message "$text"
+    fi
+}
+    
+    
+
+
 
 ##############################
 # Traitement des options     #
 ##############################
 
 # Traitement des options
-while getopts "rohlvdnsxLOaeftcp" opt; do
+while getopts "rohlvdnsxLOaeftcpwz" opt; do
     case $opt in
 
         p)
@@ -641,6 +745,12 @@ while getopts "rohlvdnsxLOaeftcp" opt; do
             ;;
         c)
             CONFIG_ENV=1
+            ;;
+        w)
+            VERIF_ALL=1
+            ;;
+        z)
+            READ_ALL=1
             ;;
             
         \?)
@@ -773,8 +883,59 @@ if [ $READ_FILE -eq 1 ]; then
     exit 0 
 fi
 
+if [ $READ_ALL -eq 1 ]; then
+    if [ $# -eq 0 ]; then
+        dir=$BASE_DIR
+        if [ $EVERYWHERE -eq 1 ]; then
+            dir=$(pwd)
+        fi
+        remove_compiled_all $dir
+    elif [ $# -eq 1 ]; then
+        # on vérifie si le premier argument est un nombre
+        if [[ $1 =~ ^[0-9]+$ ]]; then
+            num_tp=$1
+            if [ "WIN" = "$OS" ]; then
+                dir_tp="${BASE_DIR}\TP${num_tp}"
+            else 
+                dir_tp="${BASE_DIR}/TP${num_tp}"
+            fi
+            remove_compiled_all $dir_tp
+        else
+            remove_compiled_all $1
+        fi
+    else
+        output_message "Nombre d'arguments invalide" "red"
+        exit 1
+    fi
+    exit 0
+fi
 
-
+if [ $VERIF_ALL -eq 1 ]; then
+    if [ $# -eq 0 ]; then
+        dir=$BASE_DIR
+        if [ $EVERYWHERE -eq 1 ]; then
+            dir=$(pwd)
+        fi
+        compile_all $dir
+    elif [ $# -eq 1 ]; then
+        # on vérifie si le premier argument est un nombre
+        if [[ $1 =~ ^[0-9]+$ ]]; then
+            num_tp=$1
+            if [ "WIN" = "$OS" ]; then
+                dir_tp="${BASE_DIR}\TP${num_tp}"
+            else 
+                dir_tp="${BASE_DIR}/TP${num_tp}"
+            fi
+            compile_all $dir_tp
+        else
+            compile_all $1
+        fi
+    else
+        output_message "Nombre d'arguments invalide" "red"
+        exit 1
+    fi
+    exit 0
+fi
 
 # -h
 if [ $SHOW_HELP -eq 1 ]; then
