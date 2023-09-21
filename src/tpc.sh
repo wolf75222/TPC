@@ -8,9 +8,18 @@
 #################################
 
 
+##############################
+# Variables globales         #
+##############################
+
+LOGGING=${LOGGING:-0}
+LOG_FILE="log.txt"
+
+
 ###############################
 # Configuration et chargement #
 ###############################
+
 
 # Chemin absolu vers le script courant
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
@@ -22,6 +31,7 @@ if [ -f "$SCRIPT_DIR/../.env" ]; then
         [[ $line =~ ^#.*$ ]] && continue
         # Exporter la variable s'il y a quelque chose à exporter
         [ -n "$line" ] && export "$line"
+        echo "Export de $line"
     done < "$SCRIPT_DIR/../.env"
 else
     echo ".env n'existe pas"
@@ -33,35 +43,36 @@ fi
 # Fonctions de vérification  #
 ##############################
 
-# fonction de vérification de l'existence du dossier
+# Fonction de vérification de l'existence d'un dossier : Fonction(dossier) -> Affichage (tpc [options] <...>)
 check_dir() {
-    local dir=$1
-    if [ ! -d $dir ]; then
+    local dir="$1"
+    if [ ! -d "$dir" ]; then
         echo "Le dossier $dir n'existe pas"
         [ $LOGGING -eq 1 ] && log_message "Le dossier $dir n'existe pas"
         exit 1
     fi
 }
 
-# fonction de vérification de l'existence du fichier
+# Fonction de vérification de l'existence d'un fichier : Fonction(fichier) -> Affichage (tpc [options] <...>)
 check_file() {
-    local file=$1
-    if [ ! -f $file ]; then
+    local file="$1"
+    if [ ! -f "$file" ]; then
         echo "Le fichier $file n'existe pas"
         [ $LOGGING -eq 1 ] && log_message "Le fichier $file n'existe pas"
         exit 1
     fi
 }
 
-# fonction de vérification de l'existence de la variable d'environnement
+# Fonction de vérification de l'existence d'une variable d'environnement : Fonction(variable d'environnement) -> Affichage (tpc [options] <...>)
 check_env_var() {
-    local var=$1
-    if [ ! -n $var ]; then
-        echo "la variable d'environnement $var n'existe pas ou n'est pas valide"
-        [ $LOGGING -eq 1 ] && log_message "la variable d'environnement $var n'existe pas ou n'est pas valide"
+    local var_name="$1"
+    if [ -z "${!var_name}" ]; then
+        echo "La variable d'environnement $var_name n'existe pas ou n'est pas valide"
+        [ $LOGGING -eq 1 ] && log_message "La variable d'environnement $var_name n'existe pas ou n'est pas valide"
         exit 1
     fi
 }
+
 
 # fonction de vérification du bon nombre d'arguments passés sans les options : Fonction(nombre d'arguments attendus) -> Affichage (tpc [options] <...>)
 check_args() {
@@ -74,22 +85,6 @@ check_args() {
     fi
 }
 
-
-##############################
-# Vérification des paramètres#
-##############################
-
-# Vérification de l'existence du dossier
-check_env_var $BASE_DIR
-check_dir $BASE_DIR
-
-
-# Vérification de l'existence du dossier 
-check_env_var $LOG_DIR
-check_dir $LOG_DIR
-    
-# Vérification de l'existence de la variable d'environnement, spécifiant l'os (UNIX ou WIN)
-check_env_var $OS
 
 ##############################
 # Fonctions de journalisation #
@@ -138,6 +133,32 @@ exo_content=()
 current_exo_num=0
 count=0
 TEMPLATE_FILE=""
+
+
+
+##############################
+# Vérification des paramètres#
+##############################
+
+
+
+if [ $CONFIG_ENV -eq 0 ]; then
+    # Vérification de l'existence du dossier
+    check_env_var "BASE_DIR"
+    check_dir "$BASE_DIR"
+
+
+    # Vérification de l'existence du dossier 
+    check_env_var "LOG_DIR"
+    check_dir "$LOG_DIR"
+        
+    # Vérification de l'existence de la variable d'environnement, spécifiant l'os (UNIX ou WIN)
+    check_env_var "OS"
+
+    # Vérification de l'existence de la variable d'environnement, spécifiant l'auteur
+    check_env_var "AUTHOR"
+
+fi
 
 
 
@@ -439,13 +460,13 @@ create_tp_structure() {
 create_tp_structure_pdf() {
     # Récupérer le dossier de base passé en paramètre
     local base_dir=$BASE_DIR
-     text="Le dossier de base est $base_dir"
+    text="Le dossier de base est $base_dir"
     output_message "$text" "blue"
     log_message "$text"
 
     # Demandez à l'utilisateur le numéro du TP
- 
-   # Créez le dossier du TP
+
+    # Créez le dossier du TP
     tp_dir="${base_dir}/TP${tp_num}"
     if [[ -d $tp_dir ]]; then
         output_message "Le dossier $tp_dir existe déja" "red"
@@ -457,7 +478,7 @@ create_tp_structure_pdf() {
     log_message "$text"
 
     # Demandez à l'utilisateur combien d'exercices sont dans ce TP
-     for (( exo_num=1; exo_num<=${#arr[*]}; exo_num++ )); do
+    for (( exo_num=1; exo_num<=${#arr[*]}; exo_num++ )); do
         exo_dir="${tp_dir}/Exo${exo_num}"
         mkdir -p $exo_dir
         text="Le dossier $exo_dir a été créé"
@@ -494,7 +515,7 @@ add_template() {
 /* 
 * Nom du fichier: $(basename "$file_path")
 * Date: $(date)
-* Auteur: [Votre Nom]
+* Auteur: $AUTHOR
 * Description: [Description du fichier]
 */
 
