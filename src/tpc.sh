@@ -27,7 +27,7 @@ SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 # Charger les variables d'environnement depuis .env situé à la racine
 if [ -f "$SCRIPT_DIR/../.env" ]; then
-    while read -r line; do
+    while IFS= read -r line || [[ -n $line ]]; do
         # Ignorer les commentaires
         [[ $line =~ ^#.*$ ]] && continue
         # Exporter la variable s'il y a quelque chose à exporter
@@ -39,6 +39,7 @@ else
     [ $LOGGING -eq 1 ] && log_message "Le fichier .env n'existe pas"
     exit 1
 fi
+
 
 ##############################
 # Fonctions de vérification  #
@@ -678,14 +679,15 @@ check_packages() {
     # check if packages are installed
     status="$(dpkg-query -W --showformat='${db:Status-Status}' "$pkg" 2>&1)"
     if [ ! $? = 0 ] || [ ! "$status" = installed ]; then
-        echo "installing $pkg on $os."
+        #output_message "installing $pkg on $os." "blue"
+        log_message "installing $pkg on $os."
         "$command $pkg"
     fi
 }
 
 install_packages() {
     os=$1    #   os
-    echo $@
+    #echo $@
 
     case "$os" in
     "redhat")
