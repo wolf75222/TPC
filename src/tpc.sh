@@ -32,7 +32,6 @@ if [ -f "$SCRIPT_DIR/../.env" ]; then
         [[ $line =~ ^#.*$ ]] && continue
         # Exporter la variable s'il y a quelque chose à exporter
         [ -n "$line" ] && export "$line"
-        echo "Export de $line"
     done < "$SCRIPT_DIR/../.env"
 else
     echo ".env n'existe pas"
@@ -766,99 +765,6 @@ shift $((OPTIND-1))
 ##############################
 # Corps du script            #
 ##############################
-
-
-# installer les package
-
-platform='unknown'
-unamestr=$(uname)
-
-
-arch_package="poppler"
-redhat_package="poppler-utils"
-suse_package="poppler-tools"
-macos_packages="poppler"
-
-
-check_packages() {
-    pkg="$1"
-    command="$2"
-    os="$3"
-
-
-    # check if packages are installed
-    status="$(dpkg-query -W --showformat='${db:Status-Status}' "$pkg" 2>&1)"
-    if [ ! $? = 0 ] || [ ! "$status" = installed ]; then
-        #output_message "installing $pkg on $os." "blue"
-        log_message "installing $pkg on $os."
-        "$command $pkg"
-    fi
-}
-
-install_packages() {
-    os=$1    #   os
-    #echo $@
-
-    case "$os" in
-    "redhat")
-        check_packages "poppler" "sudo dnf install " $os
-        ;;
-    "debian")
-        check_packages "poppler-utils" "sudo apt-get install " $os
-        ;;
-    "suse")
-        check_packages "poppler-tools" "sudo zypper install " $os
-        ;;
-    "arch")
-        check_packages "poppler" "sudo pacman -S " $os
-        ;;
-    "freebsd")
-        check_packages "poppler-utils" "sudo pkg install " $os
-        ;;
-    "macos")
-        check_packages "poppler" "brew install " $os # should check later on if brew is installed first
-        ;;
-    *)
-        echo "Sorry, couldn't recognize your os, package installation failed"
-        ;;
-    esac
-}
-
-
-
-if [[ "$unamestr" == 'Linux' ]]; then
-    platform='linux'
- 
-
-    if [ -f /etc/redhat-release ]; then
-        platform='redhat'
-        install_packages "$platform"
-
-    elif [ -f /etc/debian_version ]; then
-        platform='debian'
-        install_packages "$platform"
-
-    elif [ -f /etc/SuSE-release ]; then
-        platform='suse'
-        install_packages "$platform"
-
-    elif [ -f /etc/arch-release ]; then
-        platform='arch'
-        install_packages "$platform"
-
-    fi
-
-elif [[ "$unamestr" == 'FreeBSD' ]]; then
-    platform='freebsd'
-    install_packages "$platform"
-
-elif [[ "$unamestr" == 'Darwin' ]]; then
-    platform='macos'
-    install_packages "$platform"
-
-fi
-
-echo "package was installed succesfully"
 
 
 
