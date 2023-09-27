@@ -47,6 +47,8 @@ Veuillez suivre cette structure pour chaque nouveau TP afin de garantir une coh�
 
 ## Fonctionnalités
 
+- **Créer la structure de TP à partir d'un PDF** : `tpc -p <fichier.pdf>`
+
 - **Configuration des variables d'environnement** : `tpc -c`
   
 - **Compilation et exécution** : Compile et exécute le fichier C spécifié.
@@ -82,6 +84,11 @@ Veuillez suivre cette structure pour chaque nouveau TP afin de garantir une coh�
 - **Ajout d'un modèle de fichier** : Ajoute un modèle à un fichier C existant ou crée un fichier C avec un modèle : `tpc -t`
 
 ## Exemples d'utilisation
+
+0. **Créer la structure de TP à partir d'un PDF**:
+    ```bash
+    tpc -p sujet_TP1.pdf  # Crée la structure pour le TP1 à partir du PDF
+    ```
 
 1. **Compiler et exécuter un fichier spécifique** :
     ```bash
@@ -145,6 +152,9 @@ BASE_DIR=/chemin/vers/vos/fichiers
 LOG_DIR=/chemin/vers/vos/logs
 # Type OS : UNIX, WIN
 OS=UNIX
+# Auteur du TP
+AUTHOR=Despoullains Romain
+
 ```
 
 ### 1. Rendre le script exécutable :
